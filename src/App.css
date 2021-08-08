@@ -33,7 +33,15 @@
 }
 
 .Output-box {
+  text-align: start;
+  margin-left: 1em;
+}
 
+.Output-box .Messages-list {
+  min-height: 50vh;
+  max-height: 50vh;
+  overflow-y: auto;
+  border: 1px solid black;
 }
 
 .Output-box textarea {

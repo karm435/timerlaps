@@ -2,13 +2,31 @@ import React, { useState } from 'react';
 import './App.css';
 import Countdown from "react-countdown";
 
-const CompletionState = () => <span>Thank you for playing</span>;
-
 function App() {
     const [completed, setCompleted] = useState(false);
-    const [tick, setTick] = useState(0);
     const [frequency, setFrequency] = useState(0);
+    const [numbersMap, setNumbersMap] = useState(new Map());
+    const [messages, setMessages] = useState(['Please input the amount of time in seconds between emitting numbers and their frequency']);
     const coundownRef = React.createRef<Countdown>();
+
+    const CompletionState = () => <span>{ getMessagesString() } Thank you for playing </span>;
+
+    const updateMap = (k: any, v: any) => {
+        setNumbersMap(new Map(numbersMap.set(k, v)));
+    }
+
+    const updateNextNumber = (e: any) => {
+        if (e.target.value) {
+            let value = numbersMap.get(e.target.value);
+            if (value) {
+                value += 1;
+                updateMap(e.target.value, value);
+            } else {
+                value = 1;
+                updateMap(e.target.value, value);
+            }
+        }
+    }
 
     const onStart = () => {
         setCompleted(false);
@@ -16,9 +34,31 @@ function App() {
     }
     const onQuit = () => {
         coundownRef.current?.getApi().stop();
-        setTick(0);
+
         setCompleted(true);
     }
+
+    const onFrequencyChange = (e: any) => {
+        const re = /^[0-9\b]+$/;
+        if (e.target.value === '' || re.test(e.target.value)) {
+            setFrequency(+e.target.value)
+        }
+    }
+
+    const onTick = () => {
+        console.log(getMessagesString())
+        setMessages([...messages, getMessagesString()]);
+        //setMessages(messages.concat('Enter next number'));
+    }
+
+    const getMessagesString = () => {
+        let messageString = '>> ';
+        numbersMap.forEach( (k,v) => {
+            messageString = messageString + `${v}:${k}, `;
+        } );
+        return messageString.substr(0, messageString.length -2);
+    }
+
     return (
         <div className="App">
             <header className="App-header">
@@ -27,31 +67,32 @@ function App() {
             <div className="Input-box">
                 <label htmlFor="seconds">Seconds (X) between outputting: </label>
                 <input name="seconds" type="text" value={frequency}
-                       onChange={ (e) => setFrequency(+e.target.value)}
+                       onChange={(e) => onFrequencyChange(e)}
                        placeholder="Seconds"/>
-                {frequency}
             </div>
             <div className="Actions-box">
-                <input type="button" value="Start" onClick={ () => onStart()}/>
-                <input type="button" value="Halt" onClick={ () => coundownRef.current?.getApi().pause()}/>
-                <input type="button" value="Resume" onClick={ () => coundownRef.current?.getApi().start()}/>
-                <input type="button" value="Quit" onClick={ () => onQuit()}/>
+                <input type="button" value="Start" onClick={() => onStart()}/>
+                <input type="button" value="Halt" onClick={() => coundownRef.current?.getApi().pause()}/>
+                <input type="button" value="Resume" onClick={() => coundownRef.current?.getApi().start()}/>
+                <input type="button" value="Quit" onClick={() => onQuit()}/>
             </div>
             <div className="Timer-box" hidden={true}>
-                <Countdown  date={Date.now() + 100000000000000000}
+                <Countdown date={Date.now() + 100000000000000000}
                            intervalDelay={frequency}
                            autoStart={false}
                            ref={coundownRef}
-                           onTick={ () => setTick( (count) => count + 1) }
-                           />
+                           onTick={() => onTick()}
+                />
             </div>
             <div className="Number-box">
-                <label htmlFor="numberInput">Enter a Number</label>
-                <input type="text" name="numberInput"/>
+                <label htmlFor="numberInput">Next Number</label>
+                <input type="text" name="numberInput" onBlur={(e) => updateNextNumber(e)}/>
             </div>
             <div className="Output-box">
                 {!completed &&
-                <textarea name="output" id="outputNumbers" cols={1} rows={1} value={tick}/>
+                <div className="Messages-list">
+                    {messages.map(txt => <p>{txt}</p>)}
+                </div>
                 }
                 {completed &&
                 <CompletionState/>
