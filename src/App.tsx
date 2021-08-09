@@ -58,6 +58,7 @@ function App() {
     const onPause = () => {
         setMessages([...messages, 'halt']);
         setIsPaused(true);
+        coundownRef.current?.getApi().pause();
     }
 
     const onQuit = () => {
