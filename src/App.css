@@ -15,7 +15,7 @@
 }
 
 .Input-box {
-
+margin-top: 0.5em;
 }
 
 .Timer-box {
@@ -26,10 +26,11 @@
 }
 
 .Number-box {
+  margin: 0.5em;
 }
 
 .Actions-box {
-
+  margin: 1em;
 }
 
 .Output-box {

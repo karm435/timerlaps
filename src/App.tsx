@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import './App.css';
 import Countdown from "react-countdown";
 
-
 function App() {
     const [completed, setCompleted] = useState(false);
     const [frequency, setFrequency] = useState(0);
@@ -97,7 +96,7 @@ function App() {
                        placeholder="Seconds"/>
             </div>
             <div className="Actions-box">
-                <input type="button" value="Start" onClick={() => onStart()}/>
+                <input type="button" value="Start" disabled={frequency === 0 || numbersMap.size === 0} onClick={() => onStart()}/>
                 <input type="button" value="Halt" onClick={() => onPause()}/>
                 <input type="button" value="Resume" onClick={() => onStart()}/>
                 <input type="button" value="Quit" onClick={() => onQuit()}/>
